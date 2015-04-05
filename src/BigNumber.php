@@ -91,11 +91,12 @@ class BigNumber
             $value = new self($value);
         }
 
-        if (empty($value->getValue())) {
+        $rawValue = $value->getValue();
+        if (empty($rawValue)) {
             throw new InvalidArgumentException('Cannot divide by zero.');
         }
 
-        $newValue = bcdiv($this->getValue(), $value->getValue());
+        $newValue = bcdiv($this->getValue(), $rawValue);
 
         $this->setValue($newValue);
 
