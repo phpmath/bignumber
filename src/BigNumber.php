@@ -45,6 +45,8 @@ class BigNumber
      */
     public function setValue($value)
     {
+        $value = (string)$value;
+
         $this->checkValue($value);
 
         $this->value = $value;
