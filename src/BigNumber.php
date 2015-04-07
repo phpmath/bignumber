@@ -167,20 +167,10 @@ class BigNumber
 
     /**
      * Performs a square root operation with the given number.
-     *
-     * @param float|int|string|BigNumber $value The value to perform a square root operation with.
      */
-    public function sqrt($value)
+    public function sqrt()
     {
-        if (!$value instanceof self) {
-            $value = new self($value);
-        }
-
-        if (!ctype_digit($value->getValue())) {
-            throw new InvalidArgumentException('Invalid exponent provided. Only integers are allowed.');
-        }
-
-        $newValue = bcsqrt($this->getValue(), $value->getValue());
+        $newValue = bcsqrt($this->getValue());
 
         $this->setValue($newValue);
 
