@@ -13,16 +13,6 @@ final class Utils
     const BASE32_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     /**
-     * Sets the default scale used for calculating with big numbers.
-     *
-     * @param int $scale The scale to set.
-     */
-    public static function setDefaultScale($scale)
-    {
-        ini_set('bcmath.scale', $scale);
-    }
-
-    /**
      * Gets the plain number from the given input. Converts a BigNumber to a string.
      *
      * @param string|int|BigNumber $number The number to convert.
