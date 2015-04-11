@@ -40,7 +40,7 @@ class BigNumber
      */
     public function __construct($value = 0, $scale = 10, $mutable = true)
     {
-        $this->setScale($scale);
+        $this->scale = $scale;
         $this->mutable = $mutable;
 
         $this->internalSetValue($value);
@@ -53,7 +53,8 @@ class BigNumber
      */
     public function getValue()
     {
-        return $this->value;
+        // Make sure we return the value with the correct scale:
+        return bcadd(0, $this->value, $this->getScale());
     }
 
     /**
@@ -88,7 +89,23 @@ class BigNumber
      */
     public function setScale($scale)
     {
-        $this->scale = $scale;
+        if (!$this->isMutable()) {
+            throw new RuntimeException(sprintf(
+                'Cannot set the scale to "%s" since the numbere is immutable.',
+                $scale
+            ));
+        }
+
+        // Convert to a string to make sure that the __toString method is called for objects.
+        $scaleValue = (string)$scale;
+        if (!ctype_digit($scaleValue)) {
+            throw new InvalidArgumentException(sprintf(
+                'Cannot set the scale to "%s". Invalid value.',
+                $scaleValue
+            ));
+        }
+
+        $this->scale = $scaleValue;
 
         return $this;
     }
@@ -136,7 +153,7 @@ class BigNumber
         if ($rawValue == 0) {
             throw new InvalidArgumentException('Cannot divide by zero.');
         }
-        
+
         $newValue = bcdiv($this->getValue(), $rawValue, $this->getScale());
 
         return $this->assignValue($newValue);
