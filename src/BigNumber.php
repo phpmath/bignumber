@@ -278,8 +278,6 @@ class BigNumber
      */
     private function assignValue($value)
     {
-        $result = null;
-
         if ($this->isMutable()) {
             $result = $this->internalSetValue($value);
         } else {
