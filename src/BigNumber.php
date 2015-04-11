@@ -105,7 +105,7 @@ class BigNumber
             ));
         }
 
-        $this->scale = $scaleValue;
+        $this->scale = (int)$scaleValue;
 
         return $this;
     }
