@@ -186,13 +186,6 @@ class BigNumber
     {
         $bigNumber = new self($value, 0, false);
 
-        if (!ctype_digit($bigNumber->getValue())) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid exponent "%s" provided. Only integers are allowed.',
-                $bigNumber->getValue()
-            ));
-        }
-
         $newValue = bcmod($this->getValue(), $bigNumber->getValue());
 
         return $this->assignValue($newValue);

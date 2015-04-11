@@ -63,6 +63,22 @@ class BigNumberModTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('0', $bigNumber->getValue());
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testWithStringAlpha()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('12345.12345');
+        $value = 'abc';
+
+        // Act
+        $bigNumber->mod($value);
+
+        // Assert
+        // ...
+    }
+
     public function testWithStringInteger()
     {
         // Arrange
