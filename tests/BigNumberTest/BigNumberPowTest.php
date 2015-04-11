@@ -7,6 +7,9 @@ use PHPUnit_Framework_TestCase;
 
 class BigNumberPowTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException InvalidArgumentException
+     */
     public function testWithBigNumber()
     {
         // Arrange
@@ -17,8 +20,7 @@ class BigNumberPowTest extends PHPUnit_Framework_TestCase
         $bigNumber->pow($value);
 
         // Assert
-        $this->assertInternalType('string', $bigNumber->getValue());
-        $this->assertEquals('12529831950385717769202749069405938445346350062072.3461609748', $bigNumber->getValue());
+        // ...
     }
 
     /**
@@ -95,5 +97,35 @@ class BigNumberPowTest extends PHPUnit_Framework_TestCase
 
         // Assert
         // ...
+    }
+
+    public function testWithMutableFalse()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('2', 10, false);
+
+        // Act
+        $newBigNumber = $bigNumber->pow(2);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('2', $bigNumber->getValue());
+        $this->assertEquals('4', $newBigNumber->getValue());
+    }
+
+    public function testWithMutableTrue()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('2', 10, true);
+
+        // Act
+        $newBigNumber = $bigNumber->pow(2);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('4', $bigNumber->getValue());
+        $this->assertEquals('4', $newBigNumber->getValue());
     }
 }

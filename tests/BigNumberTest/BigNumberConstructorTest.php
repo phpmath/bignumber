@@ -99,4 +99,30 @@ class BigNumberConstructorTest extends PHPUnit_Framework_TestCase
         // Assert
         // ...
     }
+
+    public function testWithDefaultScale()
+    {
+        // Arrange
+        // ...
+
+        // Act
+        $bigNumber = new BigNumber('12345.67890');
+
+        // Assert
+        $this->assertInternalType('string', $bigNumber->getValue());
+        $this->assertEquals('12345.67890', $bigNumber->getValue());
+    }
+
+    public function testWithCustomScale()
+    {
+        // Arrange
+        // ...
+
+        // Act
+        $bigNumber = new BigNumber('12345.67890', 2);
+
+        // Assert
+        $this->assertInternalType('string', $bigNumber->getValue());
+        $this->assertEquals('12345.67', $bigNumber->getValue());
+    }
 }

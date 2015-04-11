@@ -21,9 +21,6 @@ class BigNumberModTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('9', $bigNumber->getValue());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testWithFloat()
     {
         // Arrange
@@ -34,7 +31,8 @@ class BigNumberModTest extends PHPUnit_Framework_TestCase
         $bigNumber->mod($value);
 
         // Assert
-        // ...
+        $this->assertInternalType('string', $bigNumber->getValue());
+        $this->assertEquals('9', $bigNumber->getValue());
     }
 
     public function testWithInteger()
@@ -51,9 +49,6 @@ class BigNumberModTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('9', $bigNumber->getValue());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testWithStringFloat()
     {
         // Arrange
@@ -64,7 +59,8 @@ class BigNumberModTest extends PHPUnit_Framework_TestCase
         $bigNumber->mod($value);
 
         // Assert
-        // ...
+        $this->assertInternalType('string', $bigNumber->getValue());
+        $this->assertEquals('0', $bigNumber->getValue());
     }
 
     public function testWithStringInteger()
@@ -95,5 +91,35 @@ class BigNumberModTest extends PHPUnit_Framework_TestCase
 
         // Assert
         // ...
+    }
+
+    public function testWithMutableFalse()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('11', 10, false);
+
+        // Act
+        $newBigNumber = $bigNumber->mod(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('11', $bigNumber->getValue());
+        $this->assertEquals('1', $newBigNumber->getValue());
+    }
+
+    public function testWithMutableTrue()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('11', 10, true);
+
+        // Act
+        $newBigNumber = $bigNumber->mod(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('1', $bigNumber->getValue());
+        $this->assertEquals('1', $newBigNumber->getValue());
     }
 }

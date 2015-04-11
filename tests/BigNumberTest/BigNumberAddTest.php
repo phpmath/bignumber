@@ -92,4 +92,34 @@ class BigNumberAddTest extends PHPUnit_Framework_TestCase
         // Assert
         // ...
     }
+
+    public function testWithMutableFalse()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('0', 10, false);
+
+        // Act
+        $newBigNumber = $bigNumber->add(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('0', $bigNumber->getValue());
+        $this->assertEquals('10', $newBigNumber->getValue());
+    }
+
+    public function testWithMutableTrue()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('0', 10, true);
+
+        // Act
+        $newBigNumber = $bigNumber->add(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('10', $bigNumber->getValue());
+        $this->assertEquals('10', $newBigNumber->getValue());
+    }
 }

@@ -92,4 +92,34 @@ class BigNumberMultiplyTest extends PHPUnit_Framework_TestCase
         // Assert
         // ...
     }
+
+    public function testWithMutableFalse()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('5', 10, false);
+
+        // Act
+        $newBigNumber = $bigNumber->multiply(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('5', $bigNumber->getValue());
+        $this->assertEquals('50', $newBigNumber->getValue());
+    }
+
+    public function testWithMutableTrue()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('5', 10, true);
+
+        // Act
+        $newBigNumber = $bigNumber->multiply(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('50', $bigNumber->getValue());
+        $this->assertEquals('50', $newBigNumber->getValue());
+    }
 }

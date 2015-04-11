@@ -37,7 +37,7 @@ final class Utils
      */
     public static function convertToBase10($number, $fromBase)
     {
-        $number = static::getPlainNumber($number);
+        $number = (string)ceil(static::getPlainNumber($number));
 
         if ($fromBase == 10) {
             return $number;

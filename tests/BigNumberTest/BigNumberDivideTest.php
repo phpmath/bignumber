@@ -108,4 +108,34 @@ class BigNumberDivideTest extends PHPUnit_Framework_TestCase
         // Assert
         // ...
     }
+
+    public function testWithMutableFalse()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('10', 10, false);
+
+        // Act
+        $newBigNumber = $bigNumber->divide(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('10', $bigNumber->getValue());
+        $this->assertEquals('1', $newBigNumber->getValue());
+    }
+
+    public function testWithMutableTrue()
+    {
+        // Arrange
+        $bigNumber = new BigNumber('10', 10, true);
+
+        // Act
+        $newBigNumber = $bigNumber->divide(10);
+
+        // Assert
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $bigNumber);
+        $this->assertInstanceOf('PHP\Math\BigNumber\BigNumber', $newBigNumber);
+        $this->assertEquals('1', $bigNumber->getValue());
+        $this->assertEquals('1', $newBigNumber->getValue());
+    }
 }
