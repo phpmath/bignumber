@@ -123,4 +123,20 @@ final class Utils
 
         return $sign . ltrim($result, '0');
     }
+
+    /**
+     * Multiplies the two given numbers.
+     *
+     * @param BigNumber $lft The left number.
+     * @param BigNumber $rgt The right number.
+     * @param int $scale The scale of the calculated number.
+     * @param bool $mutable Whether or not the result is mutable.
+     * @return BigNumber
+     */
+    public static function multiply(BigNumber $lft, BigNumber $rgt, $scale = 10, $mutable = true)
+    {
+        $bigNumber = new BigNumber($lft, $scale, $mutable);
+
+        return $bigNumber->multiply($rgt);
+    }
 }
