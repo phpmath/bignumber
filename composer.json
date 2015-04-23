@@ -1,6 +1,7 @@
 {
     "name": "phpmath/bignumber",
     "description": "A PHP library to work with big numbers.",
+    "keywords": ["bignumber", "math"],
     "license": "MIT",
     "require": {
         "php": ">=5.3.3"
@@ -17,5 +18,12 @@
         "psr-4": {
             "PHP\\Math\\": "tests"
         }
-    }
+    },
+    "authors": [
+        {
+            "name": "Walter Tamboer",
+            "homepage": "http://www.waltertamboer.nl",
+            "role": "Developer"
+        }
+    ]
 }
