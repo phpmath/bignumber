@@ -17,7 +17,7 @@ It's recommended to install this library via [Composer](https://getcomposer.org)
 ```json
 {
     "require": {
-        "phpmath/bignumber": "1.0.0"
+        "phpmath/bignumber": "^1.0"
     }
 }
 ```
