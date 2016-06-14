@@ -132,6 +132,29 @@ final class Utils
     }
 
     /**
+     * Converts the given exponential value to a string.
+     *
+     * @param float|string $value The exponential value to convert.
+     * @return string
+     */
+    public static function convertExponentialToString($value)
+    {
+        if (!is_float($value)) {
+            return $value;
+        }
+
+        $result = explode('E', strtoupper($value));
+
+        if (count($result) === 1) {
+            return $result[0];
+        }
+
+        $dotSplitted = explode('.', $result[0]);
+
+        return '0.' . str_repeat('0', abs($result[1]) - 1) . $dotSplitted[0];
+    }
+
+    /**
      * Multiplies the two given numbers.
      *
      * @param BigNumber $lft The left number.

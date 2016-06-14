@@ -302,7 +302,11 @@ class BigNumber
      */
     private function internalSetValue($value)
     {
-        $valueToSet = (string)$value;
+        if (is_float($value)) {
+            $valueToSet = Utils::convertExponentialToString($value);
+        } else {
+            $valueToSet = (string)$value;
+        }
 
         if (!is_numeric($valueToSet)) {
             throw new InvalidArgumentException('Invalid number provided: ' . $valueToSet);
