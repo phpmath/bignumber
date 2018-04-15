@@ -11,9 +11,9 @@ namespace PHP\Math\BigNumberTest;
 
 use PHP\Math\BigNumber\BigNumber;
 use PHP\Math\BigNumber\Utils;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class UtilsMultiplyTest extends PHPUnit_Framework_TestCase
+class UtilsMultiplyTest extends TestCase
 {
     public function testMultiply()
     {

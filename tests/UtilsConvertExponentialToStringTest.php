@@ -10,9 +10,9 @@
 namespace PHP\Math\BigNumberTest;
 
 use PHP\Math\BigNumber\Utils;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class UtilsConvertExponentialToStringTest extends PHPUnit_Framework_TestCase
+class UtilsConvertExponentialToStringTest extends TestCase
 {
     public function testFloat()
     {

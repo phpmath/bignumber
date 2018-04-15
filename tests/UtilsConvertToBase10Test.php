@@ -11,9 +11,9 @@ namespace PHP\Math\BigNumberTest;
 
 use PHP\Math\BigNumber\BigNumber;
 use PHP\Math\BigNumber\Utils;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class UtilsConvertToBase10Test extends PHPUnit_Framework_TestCase
+class UtilsConvertToBase10Test extends TestCase
 {
     /**
      * @expectedException RuntimeException

@@ -10,9 +10,9 @@
 namespace PHP\Math\BigNumberTest;
 
 use PHP\Math\BigNumber\BigNumber;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class BigNumberSqrtTest extends PHPUnit_Framework_TestCase
+class BigNumberSqrtTest extends TestCase
 {
     public function testSqrt()
     {
