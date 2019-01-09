@@ -10,9 +10,9 @@
 namespace PHP\Math\BigNumberTest;
 
 use PHP\Math\BigNumber\BigNumber;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class BigNumberSubtractTest extends PHPUnit_Framework_TestCase
+class BigNumberSubtractTest extends TestCase
 {
     public function testWithBigNumber()
     {
