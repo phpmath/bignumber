@@ -1,172 +1,230 @@
 <?php
 /**
- * This file is part of phpmath/bignumber. (https://github.com/phpmath/bignumber)
+ * phpmath / bignumber (https://github.com/phpmath/bignumber)
  *
  * @link https://github.com/phpmath/bignumber for the canonical source repository
- * @copyright Copyright (c) 2015-2016 phpmath. (https://github.com/phpmath/)
- * @license https://raw.githubusercontent.com/phpmath/bignumber/master/LICENSE.md MIT
  */
 
-namespace PHP\Math\BigNumber;
+declare(strict_types=1);
 
-use InvalidArgumentException;
-use RuntimeException;
+namespace PHPMath\BigNumber;
+
+use PHPMath\BigNumber\Exception\InvalidBaseException;
+use PHPMath\BigNumber\Exception\InvalidValueException;
+
+use function abs;
+use function assert;
+use function bcadd;
+use function bcdiv;
+use function bcmod;
+use function bcmul;
+use function explode;
+use function is_float;
+use function is_int;
+use function is_numeric;
+use function is_string;
+use function ltrim;
+use function preg_match;
+use function rtrim;
+use function sprintf;
+use function str_contains;
+use function str_repeat;
+use function strlen;
+use function strpos;
+use function strtoupper;
+use function substr;
 
 /**
  * A utility class.
  */
 final class Utils
 {
-    const BASE32_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    public const string ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    private const string NUMERIC_PATTERN = '/^(?<sign>[+-]?)(?<int>\d*)(?:\.(?<frac>\d*))?(?:[eE](?<exp>[+-]?\d+))?$/';
 
     /**
-     * Gets the plain number from the given input. Converts a BigNumber to a string.
+     * Converts the given value to a plain decimal string (without exponent, full precision), as accepted by bcmath.
      *
-     * @param string|int|BigNumber $number The number to convert.
-     * @return string
-     */
-    public static function getPlainNumber($number)
-    {
-        if ($number instanceof BigNumber) {
-            $number = $number->getValue();
-        }
-
-        return (string)$number;
-    }
-
-    /**
-     * Converts the provided number from an arbitrary base to to a base 10 number.
+     * @param string|int|float|BigNumber $value The value to convert.
      *
-     * @param string|int|BigNumber $number The number to convert.
-     * @param int $fromBase The base to convert the number from.
-     * @return string
-     * @throws InvalidArgumentException Thrown when the base is out of reach.
+     * @return numeric-string
+     *
+     * @throws InvalidValueException Thrown when the value is not numeric.
      */
-    public static function convertToBase10($number, $fromBase)
+    public static function toNumericString(string|int|float|BigNumber $value): string
     {
-        $number = (string)ceil(static::getPlainNumber($number));
-
-        if ($fromBase == 10) {
-            return $number;
-        } elseif ($fromBase < 2 || $fromBase > 32) {
-            throw new InvalidArgumentException(sprintf(
-                'Base %d is unsupported, should be between 2 and 32.',
-                $fromBase
-            ));
+        if ($value instanceof BigNumber) {
+            return $value->getValue();
         }
 
-        $result = '0';
-        $chars = self::BASE32_ALPHABET;
-
-        for ($i = 0, $len = strlen($number); $i < $len; $i++) {
-            $index = strpos($chars, $number[$i]);
-
-            if ($index >= $fromBase) {
-                throw new RuntimeException(sprintf(
-                    'The digit %s in the number %s is an invalid digit for base-%s.',
-                    $chars[$index],
-                    $number,
-                    $fromBase
-                ));
-            }
-
-            $result = bcmul($result, $fromBase);
-            $result = bcadd($result, strpos($chars, $number[$i]));
+        if (is_int($value)) {
+            return (string)$value;
         }
+
+        $string = is_float($value) ? self::convertExponentialToString($value) : $value;
+
+        if (
+            preg_match(self::NUMERIC_PATTERN, $string, $m) !== 1
+            || ($m['int'] === '' && ($m['frac'] ?? '') === '')
+        ) {
+            throw new InvalidValueException('Invalid number provided: ' . $string);
+        }
+
+        $int = $m['int'] === '' ? '0' : $m['int'];
+        $frac = $m['frac'] ?? '';
+        $exp = (int)($m['exp'] ?? 0);
+
+        if ($exp > 0) {
+            $frac .= str_repeat('0', $exp);
+            $int .= substr($frac, 0, $exp);
+            $frac = substr($frac, $exp);
+        } elseif ($exp < 0) {
+            $shift = -$exp;
+            $int = str_repeat('0', $shift) . $int;
+            $frac = substr($int, -$shift) . $frac;
+            $int = substr($int, 0, -$shift);
+        }
+
+        $int = ltrim($int, '0');
+        $int = $int === '' ? '0' : $int;
+        $frac = rtrim($frac, '0');
+        $sign = $m['sign'] === '-' ? '-' : '';
+
+        $result = $sign . $int . ($frac === '' ? '' : '.' . $frac);
+        assert(is_numeric($result));
 
         return $result;
     }
 
     /**
-     * Converts the provided number from an arbitrary base to another arbitrary base (from 2 to 36).
+     * Converts the provided integer from an arbitrary base to a base 10 number. A fractional part is discarded.
      *
-     * @param string|int|BigNumber $number The number to convert.
-     * @param int $fromBase The base to convert the number from.
-     * @param int $toBase The base to convert the number to.
-     * @return string
-     * @throws InvalidArgumentException Thrown when the base is out of reach.
+     * @param string|int|float|BigNumber $number   The number to convert.
+     * @param int $fromBase The base to convert the number from (2 to 36).
+     *
+     * @throws InvalidBaseException Thrown when the base is out of range.
+     * @throws InvalidValueException Thrown when the number has an invalid digit.
      */
-    public static function convertBase($number, $fromBase, $toBase)
+    public static function convertToBase10(string|int|float|BigNumber $number, int $fromBase): string
     {
-        $number = static::getPlainNumber($number);
+        self::assertBase($fromBase);
 
-        if ($fromBase == $toBase) {
-            return $number;
+        $plain = is_string($number) ? $number : self::toNumericString($number);
+        $plain = self::integerPart($plain);
+        if (ltrim($plain, '-') === '') {
+            throw new InvalidValueException('Invalid number provided: ' . $plain);
         }
 
-        if ($fromBase < 2 || $fromBase > 32) {
-            throw new InvalidArgumentException(sprintf(
-                'Base %d is unsupported, should be between 2 and 32.',
-                $fromBase
-            ));
+        $sign = $plain[0] === '-' ? '-' : '';
+        $digits = strtoupper(ltrim($plain, '-'));
+
+        $result = '0';
+        for ($i = 0, $len = strlen($digits); $i < $len; $i++) {
+            $index = strpos(self::ALPHABET, $digits[$i]);
+
+            if ($index === false || $index >= $fromBase) {
+                throw new InvalidValueException(sprintf(
+                    'The digit %s in the number %s is an invalid digit for base-%d.',
+                    $digits[$i],
+                    $plain,
+                    $fromBase,
+                ));
+            }
+
+            $result = bcadd(bcmul($result, (string)$fromBase), (string)$index);
         }
 
-        if ($toBase < 2 || $toBase > 32) {
-            throw new InvalidArgumentException(sprintf(
-                'Base %d is unsupported, should be between 2 and 32.',
-                $toBase
-            ));
-        }
-
-        // Save the sign and trim it off so we can easier calculate the number:
-        $sign = (strpos($number, '-') === 0) ? '-' : '';
-        $number = ltrim($number, '-+');
-
-        // First we convert the number to a decimal value:
-        $decimal = static::convertToBase10($number, $fromBase);
-        if ($toBase == 10) {
-            return $decimal;
-        }
-
-        // Next we convert to the correct base:
-        $result = '';
-        $chars = self::BASE32_ALPHABET;
-
-        do {
-            $remainder = bcmod($decimal, $toBase);
-            $decimal = bcdiv($decimal, $toBase);
-            $result = $chars[$remainder] . $result;
-        } while (bccomp($decimal, '0'));
-
-        return $sign . ltrim($result, '0');
+        return $result === '0' ? $result : $sign . $result;
     }
 
     /**
-     * Converts the given exponential value to a string.
+     * Converts the provided integer from an arbitrary base to another arbitrary base (2 to 36).
+     * A fractional part is discarded.
      *
-     * @param float|string $value The exponential value to convert.
-     * @return string
+     * @param string|int|float|BigNumber $number   The number to convert.
+     * @param int $fromBase The base to convert the number from.
+     * @param int $toBase   The base to convert the number to.
+     *
+     * @throws InvalidBaseException Thrown when a base is out of range.
+     * @throws InvalidValueException Thrown when the number has an invalid digit.
      */
-    public static function convertExponentialToString($value)
+    public static function convertBase(string|int|float|BigNumber $number, int $fromBase, int $toBase): string
+    {
+        self::assertBase($fromBase);
+        self::assertBase($toBase);
+
+        $decimal = self::convertToBase10($number, $fromBase);
+        if ($toBase === 10) {
+            return $decimal;
+        }
+
+        $sign = $decimal[0] === '-' ? '-' : '';
+        $decimal = ltrim($decimal, '-');
+
+        $result = '';
+        do {
+            $result = self::ALPHABET[(int)bcmod($decimal, (string)$toBase)] . $result;
+            $decimal = bcdiv($decimal, (string)$toBase, 0);
+        } while ($decimal !== '0');
+
+        return $sign . $result;
+    }
+
+    /**
+     * Converts the given float to a plain decimal string without exponent.
+     *
+     * @param float|string $value The value to convert.
+     */
+    public static function convertExponentialToString(float|string $value): string
     {
         if (!is_float($value)) {
             return $value;
         }
 
-        $result = explode('E', strtoupper($value));
-
-        if (count($result) === 1) {
-            return $result[0];
+        $string = strtoupper((string)$value);
+        if (strpos($string, 'E') === false) {
+            return $string;
         }
 
-        $dotSplitted = explode('.', $result[0]);
+        [$mantissa, $exponent] = explode('E', $string);
+        $negative = $mantissa[0] === '-';
+        $mantissa = ltrim($mantissa, '-');
+        [$int, $frac] = [...explode('.', $mantissa), ''];
+        $shift = (int)$exponent;
+        $digits = $int . $frac;
+        $point = strlen($int) + $shift;
 
-        return '0.' . str_repeat('0', abs($result[1]) - 1) . $dotSplitted[0];
+        if ($point <= 0) {
+            $plain = '0.' . str_repeat('0', abs($point)) . $digits;
+        } else {
+            // PHP only uses an exponent when it is at least the precision, so the point is never inside the digits.
+            $plain = $digits . str_repeat('0', $point - strlen($digits));
+        }
+
+        if (str_contains($plain, '.')) {
+            $plain = rtrim($plain, '0');
+            $plain = rtrim($plain, '.');
+        }
+
+        return ($negative ? '-' : '') . $plain;
     }
 
-    /**
-     * Multiplies the two given numbers.
-     *
-     * @param BigNumber $lft The left number.
-     * @param BigNumber $rgt The right number.
-     * @param int $scale The scale of the calculated number.
-     * @param bool $mutable Whether or not the result is mutable.
-     * @return BigNumber
-     */
-    public static function multiply(BigNumber $lft, BigNumber $rgt, $scale = 10, $mutable = true)
+    private static function assertBase(int $base): void
     {
-        $bigNumber = new BigNumber($lft, $scale, $mutable);
+        if ($base < 2 || $base > 36) {
+            throw new InvalidBaseException(sprintf(
+                'Base %d is unsupported, should be between 2 and 36.',
+                $base,
+            ));
+        }
+    }
 
-        return $bigNumber->multiply($rgt);
+    private static function integerPart(string $number): string
+    {
+        $number = ltrim($number, '+');
+        $dot = strpos($number, '.');
+
+        return $dot === false ? $number : substr($number, 0, $dot);
     }
 }

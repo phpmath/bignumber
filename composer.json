@@ -1,33 +1,58 @@
 {
     "name": "phpmath/bignumber",
+    "type": "library",
     "description": "A PHP library to work with big numbers.",
     "keywords": [
+        "phpmath",
         "bignumber",
-        "math"
+        "bcmath",
+        "math",
+        "php8"
     ],
+    "homepage": "https://github.com/phpmath/bignumber",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Walter Tamboer",
+            "homepage": "https://waltertamboer.nl",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "php": ">=5.3.3",
+        "php": "^8.4",
         "ext-bcmath": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8 || ^5.5 || ^6.5"
+        "phpmath/coding-standard": "^2.0",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^13.4"
     },
     "autoload": {
         "psr-4": {
-            "PHP\\Math\\BigNumber\\": "src"
+            "PHPMath\\BigNumber\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PHP\\Math\\BigNumberTest\\": "tests"
+            "PHPMath\\BigNumber\\Tests\\": "tests/unit"
         }
     },
-    "authors": [
-        {
-            "name": "Walter Tamboer",
-            "homepage": "http://www.waltertamboer.nl",
-            "role": "Developer"
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": [
+            "@putenv XDEBUG_MODE=coverage",
+            "phpunit --coverage-html build/phpunit-coverage/"
+        ],
+        "check-style": "vendor/bin/phpcs",
+        "fix-style": "vendor/bin/phpcbf",
+        "analyse": "vendor/bin/phpstan analyse"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "process-timeout": 5000,
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
-    ]
+    }
 }

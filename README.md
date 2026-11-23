@@ -1,40 +1,84 @@
 # bignumber
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
-[![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
+[![Software License][ico-license]](LICENSE)
+[![CI][ico-ci]][link-ci]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![SensioLabsInsight][ico-sensio]][link-sensio]
 
-A PHP library to work with big A PHP library to work with big numbers..
+A PHP library to work with big numbers. This library makes use of the BCMath extension to do its calculations.
+Every `BigNumber` is an immutable value object: operations never change the instance, they return a new one.
 
-## Getting started
+## Documentation
 
-It's recommended to install this library via [Composer](https://getcomposer.org).
+The full documentation is at https://phpmath.github.io/bignumber/. Every release is described on the [releases page](https://github.com/phpmath/bignumber/releases).
 
-```json
-{
-    "require": {
-        "phpmath/bignumber": "^1.0"
-    }
-}
+## Install
+
+```bash
+composer require phpmath/bignumber
 ```
 
-The current master branch is considered stable. The badges on top of this document should confirm this.
+## Requirements
+
+- PHP 8.4 or newer
+- The `bcmath` extension
+
+## Usage
+
+```php
+use PHPMath\BigNumber\BigNumber;
+
+$a = new BigNumber('12345678901234567890.5', 2);
+$b = new BigNumber('0.25');
+
+$sum = $a->add($b);
+
+echo $sum->getValue(); // 12345678901234567890.75
+echo $a; // 12345678901234567890.50 (unchanged)
+```
+
+The scale (number of decimals, default 10) is set on construction. Results are truncated, not rounded, to the scale (use `round()` to round)
+of the number the operation is called on. Use `withScale()` to get a copy with another scale.
+
+## Features
+
+- `add()`, `subtract()`, `multiply()`, `divide()`, `mod()`, `pow()`, `sqrt()` and `abs()`.
+- Operands can be strings, integers, floats (also exponential notation) or other `BigNumber` instances.
+- Specific exceptions, all implementing `BigNumberException`.
+- `Utils::convertBase()` and `Utils::convertToBase10()` convert integers of any size between bases 2 and 36.
+
+## Development
+
+```bash
+composer test
+composer test-coverage
+composer analyse
+composer check-style
+composer fix-style
+```
+
+## Contributing
+
+All contributions are welcome. Open an issue or a pull request on GitHub. Please follow the coding standard and add tests.
+
+## Security
+
+If you discover a security issue, please create an issue in the issue tracker.
+
+## Credits
+
+- [Walter Tamboer](https://github.com/waltertamboer)
+- [All contributors](https://github.com/phpmath/bignumber/graphs/contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/phpmath/bignumber.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/phpmath/bignumber/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/phpmath/bignumber.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/phpmath/bignumber.svg?style=flat-square
+[ico-ci]: https://img.shields.io/github/actions/workflow/status/phpmath/bignumber/ci.yml?branch=master&style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/phpmath/bignumber.svg?style=flat-square
-[ico-sensio]: https://img.shields.io/sensiolabs/i/5ac6c499-7078-44d3-9b25-5c7acda0882a.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/phpmath/bignumber
-[link-travis]: https://travis-ci.org/phpmath/bignumber
-[link-scrutinizer]: https://scrutinizer-ci.com/g/phpmath/bignumber/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/phpmath/bignumber
-[link-downloads]: https://packagist.org/packages/phpmath/bignumber
-[link-sensio]: https://insight.sensiolabs.com/projects/5ac6c499-7078-44d3-9b25-5c7acda0882a
+[link-ci]: https://github.com/phpmath/bignumber/actions/workflows/ci.yml
+[link-downloads]: https://packagist.org/packages/phpmath/bignumber/stats
