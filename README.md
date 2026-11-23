@@ -10,7 +10,7 @@ Every `BigNumber` is an immutable value object: operations never change the inst
 
 ## Documentation
 
-The full documentation is at https://phpmath.github.io/bignumber/. Every release is described on the [releases page](https://github.com/phpmath/bignumber/releases).
+The full documentation is at https://phpmath.github.io/bignumber/. Every change is listed in the [changelog](CHANGELOG.md) and every release on the [releases page](https://github.com/phpmath/bignumber/releases).
 
 ## Install
 
